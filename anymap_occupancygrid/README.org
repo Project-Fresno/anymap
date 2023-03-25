@@ -1,0 +1,1 @@
+Core logic is in `include/anymap.hpp` and `include/occupancy_grid.hpp`
