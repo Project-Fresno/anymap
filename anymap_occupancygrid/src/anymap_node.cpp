@@ -234,7 +234,7 @@ void AnyMapNode::timer_callback() {
     }
 
     conv.toOccupancyGrid(*this->anymap_ptr.get(), "aggregate", 0, 1, *this->grid_msg_ptr.get());
-    grid_msg_ptr->header.frame_id = "camera_link";
+    grid_msg_ptr->header.frame_id = "base_link";
     this->anymap_publisher->publish(*this->grid_msg_ptr.get());
 }
 
