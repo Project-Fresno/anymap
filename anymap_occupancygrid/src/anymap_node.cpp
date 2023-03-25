@@ -187,7 +187,7 @@ void AnyMapNode::potholes_callback(const sensor_msgs::msg::PointCloud2::SharedPt
 
     Eigen::Affine3f transform_y = Eigen::Affine3f::Identity();
 
-    transform_y.pretranslate(Eigen::Vector3f(0, 0, 0));
+    transform_y.pretranslate(Eigen::Vector3f(-0.5, 0, 1.3));
     transform_y.rotate(Eigen::AngleAxisf(3.14159/2.0, Eigen::Vector3f::UnitY()));
     transform_y.rotate(Eigen::AngleAxisf(-3.14159/2.0, Eigen::Vector3f::UnitZ()));
     // NOTE camera +z became map +x, camera +x became map -y
