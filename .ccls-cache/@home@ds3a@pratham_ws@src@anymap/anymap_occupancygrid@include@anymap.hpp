@@ -24,11 +24,6 @@ namespace anymap {
 
         anymap.setGeometry(grid_map::Length(8, 8), 0.025);
         // it's a 320x320 grid
-        anymap.setPosition(grid_map::Position(4, 0));
-
-        grid_map::Index ind;
-        anymap.getIndex(grid_map::Position(0, 0), ind);
-        std::cout << "The index for position 0, 0 is : " << ind << std::endl;
 
         return anymap;
     }

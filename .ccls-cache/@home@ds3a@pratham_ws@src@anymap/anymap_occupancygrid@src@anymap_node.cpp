@@ -100,7 +100,7 @@ private:
 
 AnyMapNode::AnyMapNode() : Node("anymap_node") {
     // initialize the anymap instance, to which layers will be added
-    std::cout << "Initializing anymap\n";
+    // std::cout << "Initializing anymap\n";
     this->anymap_ptr = std::shared_ptr<grid_map::GridMap>(new grid_map::GridMap);
     *anymap_ptr.get() = anymap::init_anymap();
 
