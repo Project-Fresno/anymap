@@ -169,7 +169,7 @@ void AnyMapNode::lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
     Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 
-    transform.pretranslate(Eigen::Vector3f(0.2, 0, 0.55));
+    transform.pretranslate(Eigen::Vector3f(0.15, 0, 0.55));
 
     pcl::PointCloud<POINT_TYPE>::Ptr transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
     pcl::transformPointCloud(*this->lidar_cloud, *transformed_cloud, transform);
@@ -250,7 +250,7 @@ void AnyMapNode::timer_callback() {
     }
 
     try {
-        this->odom_to_base = this->tf_buffer_->lookupTransform("base_link", "odom", tf2::TimePointZero);
+        this->odom_to_base = this->tf_buffer_->lookupTransform("odom", "base_link", tf2::TimePointZero);
     } catch (const tf2::TransformException &ex) {
         std::cout << "Could not lookup transform, is the localization thingi running?\n";
     }
