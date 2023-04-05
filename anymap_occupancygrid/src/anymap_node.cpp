@@ -158,7 +158,7 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
     this->grid_msg_ptr = std::shared_ptr<nav_msgs::msg::OccupancyGrid>(new nav_msgs::msg::OccupancyGrid);
 
     // TODO replace this with an action server that updates the map everytime it is called
-    this->timer_ = this->create_wall_timer(150ms, std::bind(&AnyMapNode::timer_callback, this));
+    this->timer_ = this->create_wall_timer(1000ms, std::bind(&AnyMapNode::timer_callback, this));
     this->tf_timer = this->create_wall_timer(2ms, std::bind(&AnyMapNode::tf_publisher_callback, this));
 
 }
