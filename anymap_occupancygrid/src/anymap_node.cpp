@@ -169,7 +169,7 @@ void AnyMapNode::lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
     Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 
-    transform.pretranslate(Eigen::Vector3f(0.25, 0, 0.55));
+    transform.pretranslate(Eigen::Vector3f(0.15, 0, 0.55));
 
     pcl::PointCloud<POINT_TYPE>::Ptr transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
     pcl::transformPointCloud(*this->lidar_cloud, *transformed_cloud, transform);
