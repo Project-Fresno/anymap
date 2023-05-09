@@ -15,6 +15,9 @@
 #include "observation_source.hpp"
 #include "layer_postprocessor.hpp"
 
+#include "lane_extension.hpp"
+
+
 #include "anymap_interfaces/srv/trigger_update.hpp"
 
 #include "rclcpp/rclcpp.hpp"
@@ -287,7 +290,8 @@ void AnyMapNode::potholes_callback(const sensor_msgs::msg::PointCloud2::SharedPt
         this->potholes_source_ptr->update_layer();
 
         this->potholes_postprocessor.process_layer();
-   }
+        this->potholes_postprocessor.image = lane_extension::process_lane_layer(this->potholes_postprocessor.image);
+    }
 
 }
 
