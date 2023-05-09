@@ -240,8 +240,8 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     pcl::PointCloud<POINT_TYPE>::Ptr transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
     pcl::transformPointCloud(*lanes_filtered, *transformed_cloud, rs_transform);
 
-    anymap_box_filter.setInputCloud(transformed_cloud);
-    anymap_box_filter.filter(*transformed_cloud);
+    // anymap_box_filter.setInputCloud(transformed_cloud);
+    // anymap_box_filter.filter(*transformed_cloud);
 
     pcl::toROSMsg(*transformed_cloud, lanes_msg);
     lanes_msg.header.frame_id = "base_link";
