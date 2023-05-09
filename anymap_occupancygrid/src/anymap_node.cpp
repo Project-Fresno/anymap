@@ -114,8 +114,10 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
 
 
     // variables related to the potholes layer
+    rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
+    auto qos = rclcpp::Qos(rclcpp::QosInitialization(qos_profile.history, 15), qos_profile);
     potholes_subscription = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        "/pothole_points", 15, std::bind(&AnyMapNode::potholes_callback, this, std::placeholders::_1));
+        "/pothole_points", qos, 15, std::bind(&AnyMapNode::potholes_callback, this, std::placeholders::_1));
     this->potholes_source_ptr = std::shared_ptr<observation_source::ObservationSource>(
         new observation_source::ObservationSource("potholes", this->anymap_ptr));
     this->potholes_postprocessor.set_layer_name("potholes");
@@ -149,10 +151,10 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
     anymap_box_cond = range_cond;
     anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("z", pcl::ComparisonOps::LT, 1.80)));
     anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("z", pcl::ComparisonOps::GT, -0.1)));
-    anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("x", pcl::ComparisonOps::LT, 8)));
+    anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("x", pcl::ComparisonOps::LT, 7.6)));
     anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("x", pcl::ComparisonOps::GT, 0)));
-    anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("y", pcl::ComparisonOps::LT, 4.0)));
-    anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("y", pcl::ComparisonOps::GT, -4.0)));
+    anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("y", pcl::ComparisonOps::LT, 3.8)));
+    anymap_box_cond->addComparison(pcl::FieldComparison<POINT_TYPE>::Ptr (new pcl::FieldComparison<POINT_TYPE>("y", pcl::ComparisonOps::GT, -3.8)));
     anymap_box_filter.setCondition(anymap_box_cond);
 
     this->grid_msg_ptr = std::shared_ptr<nav_msgs::msg::OccupancyGrid>(new nav_msgs::msg::OccupancyGrid);
@@ -206,10 +208,11 @@ void AnyMapNode::potholes_callback(const sensor_msgs::msg::PointCloud2::SharedPt
 
     Eigen::Affine3f transform_y = Eigen::Affine3f::Identity();
 
-    transform_y.pretranslate(Eigen::Vector3f(-0.5, 0, 1.3));
+    transform_y.pretranslate(Eigen::Vector3f(-0.475, 0, 1.3));
     transform_y.rotate(Eigen::AngleAxisf(3.14159/2.0, Eigen::Vector3f::UnitY()));
     transform_y.rotate(Eigen::AngleAxisf(-3.14159/2.0, Eigen::Vector3f::UnitZ()));
 
+    transform_y.rotate(Eigen::AngleAxisf(26.2*180.0/3.141592653589793, Eigen::Vector3f::UnitY()));
     pcl::PointCloud<POINT_TYPE>::Ptr transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
     pcl::transformPointCloud(*cloud_filtered, *transformed_cloud, transform_y);
 
