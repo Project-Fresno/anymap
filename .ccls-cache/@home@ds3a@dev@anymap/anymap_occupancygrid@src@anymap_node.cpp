@@ -117,7 +117,7 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
     rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 15), qos_profile);
     potholes_subscription = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        "/pothole_points", qos, 15, std::bind(&AnyMapNode::potholes_callback, this, std::placeholders::_1));
+        "/pothole_points", qos, std::bind(&AnyMapNode::potholes_callback, this, std::placeholders::_1));
     this->potholes_source_ptr = std::shared_ptr<observation_source::ObservationSource>(
         new observation_source::ObservationSource("potholes", this->anymap_ptr));
     this->potholes_postprocessor.set_layer_name("potholes");
