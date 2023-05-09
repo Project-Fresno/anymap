@@ -71,7 +71,7 @@ private:
     // path source
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr lanes_subscription;
     std::shared_ptr<observation_source::ObservationSource> lanes_source_ptr;
-    layer_postprocesser::LayerPostProcessor lanes_postprocessor;
+    layer_postprocessor::LayerPostProcessor lanes_postprocessor;
     pcl::PointCloud<POINT_TYPE>::Ptr lanes_cloud;
     void lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr lanes_processed_publisher;
@@ -249,6 +249,7 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     this->lanes_source_ptr->update_layer();
 
     this->lanes_postprocessor.process_layer();
+    this->lanes_postprocessor.image = lane_extension::process_lane_layer(this->lanes_postprocessor.image);
 }
 
 
@@ -290,7 +291,6 @@ void AnyMapNode::potholes_callback(const sensor_msgs::msg::PointCloud2::SharedPt
         this->potholes_source_ptr->update_layer();
 
         this->potholes_postprocessor.process_layer();
-        this->potholes_postprocessor.image = lane_extension::process_lane_layer(this->potholes_postprocessor.image);
     }
 
 }
@@ -309,6 +309,10 @@ void AnyMapNode::timer_callback() {
 
     if (this->anymap_ptr->exists("potholesProcessed")) {
         this->anymap_ptr->get("aggregate") += this->anymap_ptr->get("potholesProcessed");
+    }
+
+    if (this->anymap_ptr->exists("lanesProcessed")) {
+        this->anymap_ptr->get("aggregate") += this->anymap_ptr->get("lanesProcessed");
     }
 
     try {
