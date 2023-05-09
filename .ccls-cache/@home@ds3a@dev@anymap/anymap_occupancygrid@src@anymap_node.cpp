@@ -115,7 +115,7 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
 
     // variables related to the potholes layer
     potholes_subscription = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        "camera/depth/color/points", 15, std::bind(&AnyMapNode::potholes_callback, this, std::placeholders::_1));
+        "/pothole_points", 15, std::bind(&AnyMapNode::potholes_callback, this, std::placeholders::_1));
     this->potholes_source_ptr = std::shared_ptr<observation_source::ObservationSource>(
         new observation_source::ObservationSource("potholes", this->anymap_ptr));
     this->potholes_postprocessor.set_layer_name("potholes");
