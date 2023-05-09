@@ -233,9 +233,9 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
     rs_transform.pretranslate(Eigen::Vector3f(-0.475, 0, 1.3));
     rs_transform.rotate(Eigen::AngleAxisf(3.14159/2.0, Eigen::Vector3f::UnitY()));
-    rs_transform.rotate(Eigen::AngleAxisf(-3.14159/2.0, Eigen::Vector3f::UnitZ()));
+    rs_transform.rotate(Eigen::AngleAxisf(-3.14159/2.0 - 26.2*180.0/3.141592653589793,, Eigen::Vector3f::UnitZ()));
 
-    // rs_transform.rotate(Eigen::AngleAxisf(-26.2*180.0/3.141592653589793, Eigen::Vector3f::UnitY()));
+    // rs_transform.rotate(Eigen::AngleAxisf( Eigen::Vector3f::UnitY()));
 
     pcl::PointCloud<POINT_TYPE>::Ptr transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
     pcl::transformPointCloud(*lanes_filtered, *transformed_cloud, rs_transform);
