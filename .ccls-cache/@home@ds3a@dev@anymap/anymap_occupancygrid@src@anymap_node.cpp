@@ -65,6 +65,13 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr lidar_processed_publisher;
 
 
+    // path source
+    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr lanes_subscription;
+    std::shared_ptr<observation_source::ObservationSource> lanes_source_ptr;
+    layer_postprocesser::LayerPostProcessor lanes_postprocessor;
+    pcl::PointCloud<POINT_TYPE>::Ptr lanes_cloud;
+    void lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
+    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr lanes_processed_publisher;
 
     pcl::ConditionAnd<POINT_TYPE>::Ptr anymap_box_cond;
     pcl::ConditionalRemoval<POINT_TYPE> anymap_box_filter = pcl::ConditionalRemoval<POINT_TYPE>();
@@ -110,6 +117,20 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
     // initialize the service
     this->map_update_service = this->create_service<anymap_interfaces::srv::TriggerUpdate>
         ("~/trigger_update", std::bind(&AnyMapNode::update_anymap_callback, this, std::placeholders::_1, std::placeholders::_2));
+
+
+    // variables related to lanes layer
+    rmw_qos_profile_t lanes_qos_profile = rmw_qos_profile_sensor_data;
+    auto lanes_qos = rclcpp::QoS(rclcpp::QoSInitialization(lanes_qos_profile.history, 15), lanes_qos_profile);
+    lanes_subscription = this->create_subscription<sensor_msgs::msg::PointCloud2>(
+        "/lanes_points", lanes_qos, std::bind(&AnyMapNode::lanes_callback, this, std::placeholders::_1));
+    this->lanes_source_ptr = std::shared_ptr<observation_source::ObservationSource>(
+        new observation_source::ObservationSource("lanes", this->anymap_ptr));
+    this->lanes_postprocessor.set_layer_name("lanes");
+    this->lanes_postprocessor.set_input_grid(this->anymap_ptr);
+    pcl::PointCloud<POINT_TYPE>::Ptr temp_lanes_cloud (new pcl::PointCloud<POINT_TYPE>());
+    this->lanes_cloud = temp_lanes_cloud;
+    this->lanes_processed_publisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("lanes_processed_points", 10);
 
 
 
@@ -191,6 +212,40 @@ void AnyMapNode::lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
         this->lidar_postprocessor.process_layer();
     }
+}
+
+void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg) {
+    sensor_msgs::msg::PointCloud2 lanes_msg;
+    pcl::fromROSMsg(*msg, *this->lanes_cloud);
+
+    pcl::PointCloud<POINT_TYPE>::Ptr lanes_filtered (new pcl::PointCloud<POINT_TYPE>());
+    pcl::VoxelGrid<POINT_TYPE> sor;
+
+    sor.setInputCloud(this->lanes_cloud);
+    sor.setLeafSize(0.13f, 0.13f, 0.13f);
+    sor.filter(*lanes_filtered);
+    this->lanes_source_ptr->set_point_weight(0.6);
+
+    Eigen::Affine3f rs_transform = Eigen::Affine3f::Identity();
+
+    rs_transform.pretranslate(Eigen::Vector3f(-0.475, 0, 1.3));
+    rs_transform.rotate(Eigen::AngleAxisf(3.14159/2.0, Eigen::Vector3f::UnitY()));
+    rs_transform.rotate(Eigen::AngleAxisf(-3.14159/2.0, Eigen::Vector3f::UnitZ()));
+
+    rs_transform.rotate(Eigen::AngleAxisf(26.2*180.0/3.141592653589793, Eigen::Vector3f::UnitY()));
+
+    pcl::PointCloud<POINT_TYPE>::Ptr transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
+    pcl::transformPointCloud(*lanes_filtered, *transformed_cloud, rs_transform);
+
+    anymap_box_filter.setInputCloud(transformed_cloud);
+    anymap_box_filter.filter(*transformed_cloud);
+
+    this->lanes_source_ptr->clear_layer();
+    this->lanes_source_ptr->set_update_flag();
+    this->lanes_source_ptr->set_input_cloud(transformed_cloud);
+    this->lanes_source_ptr->update_layer();
+
+    this->lanes_postprocessor.process_layer();
 }
 
 

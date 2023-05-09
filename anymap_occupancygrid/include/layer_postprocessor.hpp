@@ -12,7 +12,7 @@ namespace layer_postprocessor {
 
         void set_layer_name(std::string layer_name_);
         void set_input_grid(std::shared_ptr<grid_map::GridMap> gridmap_ptr_);
-    private:
+    // private:
         grid_map::GridMapCvConverter cv_converter;
         float inflation;
         cv::Mat image;
