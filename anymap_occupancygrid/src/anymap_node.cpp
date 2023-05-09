@@ -126,7 +126,7 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
     rmw_qos_profile_t lanes_qos_profile = rmw_qos_profile_sensor_data;
     auto lanes_qos = rclcpp::QoS(rclcpp::QoSInitialization(lanes_qos_profile.history, 15), lanes_qos_profile);
     lanes_subscription = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        "/lanes_points", lanes_qos, std::bind(&AnyMapNode::lanes_callback, this, std::placeholders::_1));
+        "/lane_points", lanes_qos, std::bind(&AnyMapNode::lanes_callback, this, std::placeholders::_1));
     this->lanes_source_ptr = std::shared_ptr<observation_source::ObservationSource>(
         new observation_source::ObservationSource("lanes", this->anymap_ptr));
     this->lanes_postprocessor.set_layer_name("lanes");
@@ -141,7 +141,7 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
     rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 15), qos_profile);
     potholes_subscription = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        "/pothole_points", qos, std::bind(&AnyMapNode::potholes_callback, this, std::placeholders::_1));
+        "/potholes_points", qos, std::bind(&AnyMapNode::potholes_callback, this, std::placeholders::_1));
     this->potholes_source_ptr = std::shared_ptr<observation_source::ObservationSource>(
         new observation_source::ObservationSource("potholes", this->anymap_ptr));
     this->potholes_postprocessor.set_layer_name("potholes");
@@ -242,6 +242,10 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
     anymap_box_filter.setInputCloud(transformed_cloud);
     anymap_box_filter.filter(*transformed_cloud);
+
+    pcl::toROSMsg(*transformed_cloud, lanes_msg);
+    lanes_msg.header.frame_id = "base_link";
+    this->lanes_processed_publisher->publish(lanes_msg);
 
     this->lanes_source_ptr->clear_layer();
     this->lanes_source_ptr->set_update_flag();
