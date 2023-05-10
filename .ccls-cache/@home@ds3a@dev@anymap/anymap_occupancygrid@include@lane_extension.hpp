@@ -21,8 +21,8 @@ std::vector<std::vector<cv::Point>> find_contours(cv::Mat frame) {
 }
 
 
-string type2str(int type) {
-  string r;
+std::string type2str(int type) {
+  std::string r;
 
   uchar depth = type & CV_MAT_DEPTH_MASK;
   uchar chans = 1 + (type >> CV_CN_SHIFT);
@@ -184,7 +184,7 @@ namespace lane_extension {
             cv::Mat result;
             std::cout << "applying bitwise and on image of size " << image.channels()
                 << " and mask of no channels " << masks[i].channels() << std::endl;
-            std::cout << "the types of the image and mask respectively are " << type2str(image) << " " << type2str(masks[i]) << std::endl;
+            std::cout << "the types of the image and mask respectively are " << type2str(image.type()) << " " << type2str(masks[i].type()) << std::endl;
 
 
             cv::bitwise_and(image, masks[i], result);
