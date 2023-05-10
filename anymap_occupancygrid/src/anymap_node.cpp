@@ -196,10 +196,6 @@ void AnyMapNode::lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     sensor_msgs::msg::PointCloud2 lidar_msg;
     pcl::fromROSMsg(*msg, *this->lidar_cloud);
 
-
-    anymap_box_filter.setInputCloud(this->lidar_cloud);
-    anymap_box_filter.filter(*this->lidar_cloud);
-
     Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 
     transform.pretranslate(Eigen::Vector3f(0.15, 0, 0.55));
@@ -236,9 +232,6 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     pcl::fromROSMsg(*msg, *this->lanes_cloud);
 
 
-    anymap_box_filter.setInputCloud(this->lanes_cloud);
-    anymap_box_filter.filter(*this->lanes_cloud);
-
     pcl::PointCloud<POINT_TYPE>::Ptr lanes_filtered (new pcl::PointCloud<POINT_TYPE>());
     pcl::VoxelGrid<POINT_TYPE> sor;
 
@@ -257,6 +250,10 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
     pcl::PointCloud<POINT_TYPE>::Ptr lanes_transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
     pcl::transformPointCloud(*lanes_filtered, *lanes_transformed_cloud, rs_transform);
+
+
+    anymap_box_filter.setInputCloud(lanes_transformed_cloud);
+    anymap_box_filter.filter(*lanes_transformed_cloud);
 
 
     pcl::toROSMsg(*lanes_transformed_cloud, lanes_msg);
