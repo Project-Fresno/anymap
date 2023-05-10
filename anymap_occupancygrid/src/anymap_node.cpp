@@ -266,6 +266,7 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     this->lanes_source_ptr->update_layer();
 
     this->lanes_postprocessor.process_layer();
+    std::cout << "the lane layer image is of size " << lanes_postprocessor.image.size() << " " << lanes_postprocessor.image.channels() << std::endl;
     this->lanes_postprocessor.image = lane_extension::process_lane_layer(this->lanes_postprocessor.image);
 }
 
