@@ -20,6 +20,31 @@ std::vector<std::vector<cv::Point>> find_contours(cv::Mat frame) {
   return contours;
 }
 
+
+string type2str(int type) {
+  string r;
+
+  uchar depth = type & CV_MAT_DEPTH_MASK;
+  uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+  switch ( depth ) {
+    case CV_8U:  r = "8U"; break;
+    case CV_8S:  r = "8S"; break;
+    case CV_16U: r = "16U"; break;
+    case CV_16S: r = "16S"; break;
+    case CV_32S: r = "32S"; break;
+    case CV_32F: r = "32F"; break;
+    case CV_64F: r = "64F"; break;
+    default:     r = "User"; break;
+  }
+
+  r += "C";
+  r += (chans+'0');
+
+  return r;
+}
+
+
 namespace lane_extension {
     std::vector<cv::Point2f> order_points_new(const std::vector<cv::Point2f>& pts) {
         // Sort the points based on their x-coordinates
@@ -159,6 +184,9 @@ namespace lane_extension {
             cv::Mat result;
             std::cout << "applying bitwise and on image of size " << image.channels()
                 << " and mask of no channels " << masks[i].channels() << std::endl;
+            std::cout << "the types of the image and mask respectively are " << type2str(image) << " " << type2str(masks[i]) << std::endl;
+
+
             cv::bitwise_and(image, masks[i], result);
 
             std::cout << "now finding contours\n";
