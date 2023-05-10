@@ -177,35 +177,35 @@ namespace lane_extension {
 
 
     std::vector<cv::Mat> extend_lanes(cv::Mat image, int num_masks, std::vector<cv::Mat> masks) {
-        std::cout << "[extend lanes]; input image size " << image.size() << " " << image.channels() << std::endl;
+        // std::cout << "[extend lanes]; input image size " << image.size() << " " << image.channels() << std::endl;
 
         std::vector<cv::Mat> results;
         for (int i = 0; i < num_masks; i++) {
             cv::Mat result;
-            std::cout << "applying bitwise and on image of size " << image.channels()
-                << " and mask of no channels " << masks[i].channels() << std::endl;
-            std::cout << "the types of the image and mask respectively are " << type2str(image.type()) << " " << type2str(masks[i].type()) << std::endl;
+            // std::cout << "applying bitwise and on image of size " << image.channels()
+                // << " and mask of no channels " << masks[i].channels() << std::endl;
+            // std::cout << "the types of the image and mask respectively are " << type2str(image.type()) << " " << type2str(masks[i].type()) << std::endl;
 
 
             cv::bitwise_and(image, masks[i], result);
 
-            std::cout << "now finding contours\n";
+            // std::cout << "now finding contours\n";
             auto contours = find_contours(result);
             if (contours.size() > 0) {
-                std::cout << "num contours is greater than 0\n";
+                // std::cout << "num contours is greater than 0\n";
                 for (int j=0; j<contours.size(); j++) {
                     // auto blackbox = cv::minAreaRect(contours[i]);
                     // blackbox.points(vertices);
 
-                    std::cout << "finding the bounding rect\n";
+                    // std::cout << "finding the bounding rect\n";
 
                     cv::RotatedRect minRect = cv::minAreaRect(contours[j]);
                     std::vector<cv::Point2f> vertices(4);
                     minRect.points(vertices.data());
 
-                    std::cout << "points without sorting : " << vertices << "\n";
+                    // std::cout << "points without sorting : " << vertices << "\n";
                     vertices = lane_extension::order_points_new(vertices);
-                    std::cout << "points with sorting : " << vertices << "\n";
+                    // std::cout << "points with sorting : " << vertices << "\n";
 
                     cv::Point mid_point_a = 0.5*(vertices[0] + vertices[1]);
                     cv::Point mid_point_b = 0.5*(vertices[2] + vertices[3]);
@@ -231,7 +231,7 @@ namespace lane_extension {
                         angle = -1;
                     }
 
-                    std::cout << "the angle is : " << angle << "\n";
+                    // std::cout << "the angle is : " << angle << "\n";
                     if ((angle>=75)) {
                         lane_extension::full_line(&result,
                                                   0.5*(vertices[0]+vertices[1]),
@@ -296,11 +296,11 @@ namespace lane_extension {
         std::vector<cv::Mat> masks(num_masks);
         masks = lane_extension::generate_sliding_masks(image_size, window_length);
 
-        std::cout << "generated the sliding masks, now extending lanes\n";
+        // std::cout << "generated the sliding masks, now extending lanes\n";
         std::vector<cv::Mat> results = lane_extension::extend_lanes(lanes_layer, num_masks, masks);
 
 
-        std::cout << "lane extended images generated, now integrating all images\n";
+        // std::cout << "lane extended images generated, now integrating all images\n";
         cv::Mat extension_mask = cv::Mat::zeros(cv::Size(lanes_layer.rows, lanes_layer.cols), CV_8U);
         extension_mask.rowRange(window_length, image_size) = cv::Scalar(255);
 
