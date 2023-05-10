@@ -193,6 +193,10 @@ void AnyMapNode::lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     sensor_msgs::msg::PointCloud2 lidar_msg;
     pcl::fromROSMsg(*msg, *this->lidar_cloud);
 
+
+    anymap_box_filter.setInputCloud(this->lidar_cloud);
+    anymap_box_filter.filter(*this->lidar_cloud);
+
     Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 
     transform.pretranslate(Eigen::Vector3f(0.15, 0, 0.55));
@@ -221,11 +225,15 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     sensor_msgs::msg::PointCloud2 lanes_msg;
     pcl::fromROSMsg(*msg, *this->lanes_cloud);
 
+
+    anymap_box_filter.setInputCloud(this->lanes_cloud);
+    anymap_box_filter.filter(*this->lanes_cloud);
+
     pcl::PointCloud<POINT_TYPE>::Ptr lanes_filtered (new pcl::PointCloud<POINT_TYPE>());
     pcl::VoxelGrid<POINT_TYPE> sor;
 
     sor.setInputCloud(this->lanes_cloud);
-    sor.setLeafSize(0.13f, 0.13f, 0.13f);
+    sor.setLeafSize(0.18f, 0.18f, 0.18f);
     sor.filter(*lanes_filtered);
     this->lanes_source_ptr->set_point_weight(0.6);
 
@@ -237,19 +245,17 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
     rs_transform.rotate(Eigen::AngleAxisf(18.2*180.0/3.14159, Eigen::Vector3f::UnitX()));
 
-    pcl::PointCloud<POINT_TYPE>::Ptr transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
-    pcl::transformPointCloud(*lanes_filtered, *transformed_cloud, rs_transform);
+    pcl::PointCloud<POINT_TYPE>::Ptr lanes_transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
+    pcl::transformPointCloud(*lanes_filtered, *lanes_transformed_cloud, rs_transform);
 
-    // anymap_box_filter.setInputCloud(transformed_cloud);
-    // anymap_box_filter.filter(*transformed_cloud);
 
-    pcl::toROSMsg(*transformed_cloud, lanes_msg);
+    pcl::toROSMsg(*lanes_transformed_cloud, lanes_msg);
     lanes_msg.header.frame_id = "base_link";
     this->lanes_processed_publisher->publish(lanes_msg);
 
     this->lanes_source_ptr->clear_layer();
     this->lanes_source_ptr->set_update_flag();
-    this->lanes_source_ptr->set_input_cloud(transformed_cloud);
+    this->lanes_source_ptr->set_input_cloud(lanes_transformed_cloud);
     this->lanes_source_ptr->update_layer();
 
     this->lanes_postprocessor.process_layer();
