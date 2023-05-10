@@ -10,9 +10,9 @@
 std::vector<std::vector<cv::Point>> find_contours(cv::Mat frame) {
 
   // std::cout << "finding contours\n";
-  cv::Mat grayscale_image;
+  cv::Mat grayscale_image = frame;
 
-  cv::cvtColor(frame, grayscale_image, cv::COLOR_BGR2GRAY);
+  // cv::cvtColor(frame, grayscale_image, cv::COLOR_BGR2GRAY);
   std::vector<std::vector<cv::Point>> contours;
   cv::findContours(grayscale_image, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
@@ -155,8 +155,11 @@ namespace lane_extension {
         std::vector<cv::Mat> results;
         for (int i = 0; i < num_masks; i++) {
             cv::Mat result;
-            cv::bitwise_and(image, image, result, masks[i]);
+            // std::cout << "applying bitwise and on image of size " << image.channels()
+                // << " and mask of no channels " << masks[i].channels() << std::endl;
+            cv::bitwise_and(image, masks[i], result);
 
+            // std::cout << "now finding contours\n";
             auto contours = find_contours(result);
             if (contours.size() > 0) {
                 // std::cout << "num contours is greater than 0\n";
@@ -203,14 +206,14 @@ namespace lane_extension {
                         lane_extension::full_line(&result,
                                                   0.5*(vertices[0]+vertices[1]),
                                                   0.5*(vertices[3]+vertices[2]),
-                                                  cv::Scalar(255, 255, 255));
-                                                  // cv::Scalar(255));
+                                                  // cv::Scalar(255, 255, 255));
+                                                  cv::Scalar(255));
                     } else if (angle<=15 && angle >=0) {
                         lane_extension::full_line(&result,
                                                   0.5*(vertices[0]+vertices[3]),
                                                   0.5*(vertices[2]+vertices[1]),
-                                                  cv::Scalar(255, 255, 255));
-                                                  // cv::Scalar(255));
+                                                  // cv::Scalar(255, 255, 255));
+                                                  cv::Scalar(255));
                     }
                 }
             }
@@ -226,12 +229,12 @@ namespace lane_extension {
     cv::Mat integrate_imgs(cv::Mat original_img, cv::Mat mask, std::vector<cv::Mat> results) {
         int length = results.size();
 
-        cv::Mat gray_img = cv::Mat::zeros(cv::Size(original_img.rows, original_img.cols), 0);
-        cv::cvtColor(original_img, gray_img, cv::COLOR_BGR2GRAY);
+        cv::Mat gray_img = original_img;
+        // cv::cvtColor(original_img, gray_img, cv::COLOR_BGR2GRAY);
 
         cv::Mat final_image = gray_img;
 /*
-        std::cout << "the gray image size is " << gray_img.size() << " " << gray_img.channels() << std::endl;
+        // std::cout << "the gray image size is " << gray_img.size() << " " << gray_img.channels() << std::endl;
         std::cout << "the mask size is " << mask.size() << " " << mask.channels() << std::endl;
         std::cout << "the final image size is " << final_image.size() << " " << final_image.channels() << std::endl;
 */
@@ -240,10 +243,10 @@ namespace lane_extension {
 
             // std::cout << "performing bitwise and between result and mask, storing in temp\n";
             cv::Mat dst = cv::Mat::zeros(cv::Size(mask.rows, mask.cols), CV_8U);
-            cv::cvtColor(results[i], dst, cv::COLOR_BGR2GRAY);
+            // cv::cvtColor(results[i], dst, cv::COLOR_BGR2GRAY);
             // std::cout << "the result image size is " << dst.size() << " " << dst.channels() << std::endl;
             // std::cout << "the size of temp is " << temp.size() << " " << temp.channels() << std::endl;
-            cv::bitwise_and(dst, mask, temp);
+            cv::bitwise_and(results[i], mask, temp);
             // std::cout << "performing bitwise or between temp and gray_image, storing in temp\n";
 
             temp = temp | gray_img;
@@ -263,9 +266,11 @@ namespace lane_extension {
         std::vector<cv::Mat> masks(num_masks);
         masks = lane_extension::generate_sliding_masks(image_size, window_length);
 
+        // std::cout << "generated the sliding masks, now extending lanes\n";
         std::vector<cv::Mat> results = lane_extension::extend_lanes(lanes_layer, num_masks, masks);
 
 
+        // std::cout << "lane extended images generated, now integrating all images\n";
         cv::Mat extension_mask = cv::Mat::zeros(cv::Size(lanes_layer.rows, lanes_layer.cols), CV_8U);
         extension_mask.rowRange(window_length, image_size) = cv::Scalar(255);
 
