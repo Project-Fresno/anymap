@@ -271,7 +271,9 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     cv::Mat post_processor_uint8;
     this->lanes_postprocessor.image.convertTo(this->lanes_postprocessor.image, CV_8UC1, 255.0);
     this->lanes_postprocessor.image = lane_extension::process_lane_layer(this->lanes_postprocessor.image);
+    cv::imshow("extended lanes image", this->lanes_postprocessor.image);
     this->lanes_postprocessor.image.convertTo(this->lanes_postprocessor.image, CV_32FC1, 1.0/255.0);
+
 }
 
 
