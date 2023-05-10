@@ -75,6 +75,9 @@ private:
     pcl::PointCloud<POINT_TYPE>::Ptr lanes_cloud;
     void lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr lanes_processed_publisher;
+    int lane_counter = 0;
+
+
 
     pcl::ConditionAnd<POINT_TYPE>::Ptr anymap_box_cond;
     pcl::ConditionalRemoval<POINT_TYPE> anymap_box_filter = pcl::ConditionalRemoval<POINT_TYPE>();
@@ -222,6 +225,13 @@ void AnyMapNode::lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 }
 
 void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg) {
+    this->lane_counter++;
+    if (lane_counter != 5) {
+        return;
+    } else {
+        lane_counter = 0;
+    }
+
     sensor_msgs::msg::PointCloud2 lanes_msg;
     pcl::fromROSMsg(*msg, *this->lanes_cloud);
 
