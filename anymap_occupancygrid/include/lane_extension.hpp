@@ -248,7 +248,7 @@ namespace lane_extension {
                 }
             }
             results.push_back(result);
-            imshow("Mask " + std::to_string(i), result);
+            // imshow("Mask " + std::to_string(i), result);
         }
 
         // Wait for a key press
