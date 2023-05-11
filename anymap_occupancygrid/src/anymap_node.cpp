@@ -285,7 +285,7 @@ void AnyMapNode::potholes_callback(const sensor_msgs::msg::PointCloud2::SharedPt
     pcl::PointCloud<POINT_TYPE>::Ptr cloud_filtered (new pcl::PointCloud<POINT_TYPE>());
     pcl::VoxelGrid<POINT_TYPE> sor;
     sor.setInputCloud (this->potholes_cloud);
-    sor.setLeafSize (0.13f, 0.13f, 0.13f);
+    sor.setLeafSize (0.23f, 0.23f, 0.23f);
     sor.filter (*cloud_filtered);
     this->potholes_source_ptr->set_point_weight(0.6);
 
@@ -295,7 +295,7 @@ void AnyMapNode::potholes_callback(const sensor_msgs::msg::PointCloud2::SharedPt
     transform_y.rotate(Eigen::AngleAxisf(3.14159/2.0, Eigen::Vector3f::UnitY()));
     transform_y.rotate(Eigen::AngleAxisf(-3.14159/2.0, Eigen::Vector3f::UnitZ()));
 
-    transform_y.rotate(Eigen::AngleAxisf(26.2*180.0/3.141592653589793, Eigen::Vector3f::UnitY()));
+    transform_y.rotate(Eigen::AngleAxisf(26.2*180.0/3.1415, Eigen::Vector3f::UnitY()));
     pcl::PointCloud<POINT_TYPE>::Ptr transformed_cloud (new pcl::PointCloud<POINT_TYPE>());
     pcl::transformPointCloud(*cloud_filtered, *transformed_cloud, transform_y);
 
