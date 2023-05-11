@@ -236,7 +236,7 @@ void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
     pcl::VoxelGrid<POINT_TYPE> sor;
 
     sor.setInputCloud(this->lanes_cloud);
-    sor.setLeafSize(0.28f, 0.28f, 0.28f);
+    sor.setLeafSize(0.28f, 0.28f, 1.28f);
     sor.filter(*lanes_filtered);
     this->lanes_source_ptr->set_point_weight(0.6);
 
