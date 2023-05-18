@@ -12,9 +12,12 @@ namespace layer_postprocessor {
 
         void set_layer_name(std::string layer_name_);
         void set_input_grid(std::shared_ptr<grid_map::GridMap> gridmap_ptr_);
+        void set_inflation(int _inflation_l, int _inflation_w);
+
     // private:
         grid_map::GridMapCvConverter cv_converter;
-        float inflation;
+        int inflation_l = 47;
+        int inflation_w = 47;
         cv::Mat image;
         std::string layer_name;
         std::shared_ptr<grid_map::GridMap> anymap_ptr_;
@@ -25,6 +28,11 @@ namespace layer_postprocessor {
     };
 
     LayerPostProcessor::LayerPostProcessor() {
+    }
+
+    void LayerPostProcessor::set_inflation(int _inflation_l, int _inflation_w) {
+        this->inflation_l = _inflation_l;
+        this->inflation_w = _inflation_w;
     }
 
     void LayerPostProcessor::set_layer_name(std::string layer_name_) {
@@ -67,7 +75,7 @@ namespace layer_postprocessor {
                   cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));
         this->image = image_eroded_with_3x3_kernel;
 */        cv::dilate(this->image, image_eroded_with_3x3_kernel,
-                   cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(47, 47)));
+                   cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(this->inflation_l, this->inflation_w)));
         this->image = image_eroded_with_3x3_kernel;
 
 
