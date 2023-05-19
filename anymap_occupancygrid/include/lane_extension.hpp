@@ -220,7 +220,7 @@ namespace lane_extension {
                     float angle;
 
                     if ((length >= 30) && (breadth >= 30) // ensure that the thingi is not random noise
-                        && (abs(length-breadth) >= 5)) { // ensure that the bounding box is not a square i.e. pothole
+                        && (abs(length-breadth) >= 15)) { // ensure that the bounding box is not a square i.e. pothole
                         if (breadth <= 130) {
                             angle = abs(atan(lane_extension::slope(mid_point_a, mid_point_b)))*180/3.14159;
                         } else if (breadth >= 130) {
