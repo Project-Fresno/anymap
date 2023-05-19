@@ -136,6 +136,55 @@ namespace lane_extension {
         line(*img,p,q,color,1,8,0);
     }
 */
+
+
+    std::vector<cv::Rect> remove_potholes(cv::Mat* original_image) {
+        std::vector<cv::Rect> potholes;
+        // assume image is single channel
+
+        std::vector<std::vector<cv::Point>> contours;
+        cv::findContours(*original_image,contours,cv::RETR_TREE,cv::CHAIN_APPROX_SIMPLE);
+
+        if (contours.size() > 0 ) {
+            for (int i=0; i<contours.size(); i++) {
+                cv::Rect rect = cv::boundingRect(contours[i]);
+                if (abs(rect.width - rect.height) <= 5) {
+                    potholes.push_back(rect);
+
+                    cv::Point pt1, pt2;
+                    pt1.x = rect.x;
+                    pt1.y = rect.y;
+                    pt2.x = rect.x + rect.width;
+                    pt2.y = rect.y + rect.height;
+
+                    cv::rectangle(*original_image, pt1, pt2, cv::Scalar(0), -1);
+                }
+
+            }
+        }
+
+        return potholes;
+    }
+
+    cv::Mat add_potholes(cv::Mat* original_image, std::vector<cv::Rect> potholes) {
+        for (int i=0; i<potholes.size(); i++) {
+
+            cv::Point pt1, pt2;
+            cv::Rect rect = potholes[i];
+            pt1.x = rect.x;
+            pt1.y = rect.y;
+            pt2.x = rect.x + rect.width;
+            pt2.y = rect.y + rect.height;
+
+            cv::circle(*original_image, 0.5*(pt1+pt2), 45, cv::Scalar(255), -1);
+        }
+
+        return *original_image;
+    }
+
+
+
+
     void full_line(cv::Mat* img, cv::Point a, cv::Point b, cv::Scalar color)
     {
         //points of line segment
@@ -178,6 +227,8 @@ namespace lane_extension {
 
     std::vector<cv::Mat> extend_lanes(cv::Mat image, int num_masks, std::vector<cv::Mat> masks) {
         // std::cout << "[extend lanes]; input image size " << image.size() << " " << image.channels() << std::endl;
+
+
 
         std::vector<cv::Mat> results;
         for (int i = 0; i < num_masks; i++) {
@@ -297,6 +348,10 @@ namespace lane_extension {
         std::vector<cv::Mat> masks(num_masks);
         masks = lane_extension::generate_sliding_masks(image_size, window_length);
 
+        // find potholes add their positions to a vector
+        // remove potholes from the original image
+        auto potholes = lane_extension::remove_potholes(&lanes_layer);
+
         // std::cout << "generated the sliding masks, now extending lanes\n";
         std::vector<cv::Mat> results = lane_extension::extend_lanes(lanes_layer, num_masks, masks);
 
@@ -306,6 +361,9 @@ namespace lane_extension {
         extension_mask.rowRange(window_length, image_size) = cv::Scalar(255);
 
         cv::Mat final_img = lane_extension::integrate_imgs(lanes_layer, extension_mask, results);
+
+        lane_extension::add_potholes(&final_img, potholes);
+        // TODO add potholes back to the final image
 
         return final_img;
     }
