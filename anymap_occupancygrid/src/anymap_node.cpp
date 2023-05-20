@@ -223,7 +223,7 @@ void AnyMapNode::lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr m
 
 void AnyMapNode::lanes_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg) {
     this->lane_counter++;
-    if (lane_counter != 6) {
+    if (lane_counter != 7) {
         return;
     } else {
         lane_counter = 0;
