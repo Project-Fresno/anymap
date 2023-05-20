@@ -14,7 +14,7 @@ std::vector<std::vector<cv::Point>> find_contours(cv::Mat frame) {
 
   // cv::cvtColor(frame, grayscale_image, cv::COLOR_BGR2GRAY);
   std::vector<std::vector<cv::Point>> contours;
-  cv::findContours(grayscale_image, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+  cv::findContours(grayscale_image, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
   // std::cout << "found contours\n";
   return contours;
@@ -143,7 +143,7 @@ namespace lane_extension {
         // assume image is single channel
 
         std::vector<std::vector<cv::Point>> contours;
-        cv::findContours(*original_image,contours,cv::RETR_TREE,cv::CHAIN_APPROX_SIMPLE);
+        cv::findContours(*original_image,contours,cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
         if (contours.size() > 0 ) {
             for (int i=0; i<contours.size(); i++) {
