@@ -350,7 +350,7 @@ namespace lane_extension {
 
         // find potholes add their positions to a vector
         // remove potholes from the original image
-        auto potholes = lane_extension::remove_potholes(&lanes_layer);
+        // auto potholes = lane_extension::remove_potholes(&lanes_layer);
 
         // std::cout << "generated the sliding masks, now extending lanes\n";
         std::vector<cv::Mat> results = lane_extension::extend_lanes(lanes_layer, num_masks, masks);
@@ -362,7 +362,7 @@ namespace lane_extension {
 
         cv::Mat final_img = lane_extension::integrate_imgs(lanes_layer, extension_mask, results);
 
-        lane_extension::add_potholes(&final_img, potholes);
+        // lane_extension::add_potholes(&final_img, potholes);
         // TODO add potholes back to the final image
 
         return final_img;
