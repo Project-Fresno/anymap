@@ -164,6 +164,8 @@ AnyMapNode::AnyMapNode() : Node("anymap_node") {
         new observation_source::ObservationSource("lidar", this->anymap_ptr));
     this->lidar_postprocessor.set_layer_name("lidar");
     this->lidar_postprocessor.set_input_grid(this->anymap_ptr);
+    this->lidar_postprocessor.set_inflation(50, 50);
+
     pcl::PointCloud<POINT_TYPE>::Ptr temp_lidar_cloud (new pcl::PointCloud<POINT_TYPE>());
     this->lidar_cloud = temp_lidar_cloud;
     this->lidar_processed_publisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("lidar_processed_points", 10);
