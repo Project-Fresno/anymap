@@ -290,7 +290,7 @@ namespace lane_extension {
                                                   0.5*(vertices[3]+vertices[2]),
                                                   // cv::Scalar(255, 255, 255));
                                                   cv::Scalar(255));
-                    } else if (angle<=15 && angle >=0) {
+                    } else if (angle<=25 && angle >=0) {
                         lane_extension::full_line(&result,
                                                   0.5*(vertices[0]+vertices[3]),
                                                   0.5*(vertices[2]+vertices[1]),
