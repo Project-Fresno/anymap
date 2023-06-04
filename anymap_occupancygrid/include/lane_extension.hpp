@@ -320,7 +320,7 @@ namespace lane_extension {
         std::cout << "the mask size is " << mask.size() << " " << mask.channels() << std::endl;
         std::cout << "the final image size is " << final_image.size() << " " << final_image.channels() << std::endl;
 */
-        for(int i=0+length/3; i<length; i++) {
+        for(int i=1+length/3; i<length; i++) {
             cv::Mat temp = cv::Mat::zeros(cv::Size(gray_img.rows, gray_img.cols), 0);
 
             // std::cout << "performing bitwise and between result and mask, storing in temp\n";
