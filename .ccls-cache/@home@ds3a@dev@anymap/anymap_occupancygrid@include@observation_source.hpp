@@ -22,7 +22,7 @@ namespace observation_source {
             this->point_weight = 0.8;
         }
 
-        void set_input_cloud(boost::shared_ptr<pcl::PointCloud<POINT_TYPE>> input_cloud) {
+        void set_input_cloud(pcl::PointCloud<POINT_TYPE>::Ptr input_cloud) {
             this->cloud = input_cloud;
         }
 
